@@ -52,3 +52,39 @@ class BloomFilter:
 
         # keep track of how many items have been inserted
         self.num_inserted = 0
+# ------------------------------------------------------------------
+    # Hash functions
+    # ------------------------------------------------------------------
+
+    def _get_hash_positions(self, item):
+        """
+        For a given item, return k positions in the bit array.
+
+        We run k slightly different hash functions by mixing a different
+        seed number into each one. That way one item maps to k positions.
+
+        item : the string we want to hash
+        """
+
+        # convert the item to a string just in case it is not already
+        item_as_string = str(item)
+
+        positions = []
+
+        for seed in range(self.num_hash_functions):
+            # mix the seed into the input so each hash function is different
+            combined = f"{seed}:{item_as_string}"
+
+            # SHA-256 gives a reliable spread of bits
+            hash_bytes = hashlib.sha256(combined.encode("utf-8")).hexdigest()
+
+            # turn the hex string into a big integer
+            hash_as_int = int(hash_bytes, 16)
+
+            # bring that integer into the range of our bit array
+            position = hash_as_int % self.bit_array_size
+
+            positions.append(position)
+
+        return positions
+    
