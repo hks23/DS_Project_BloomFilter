@@ -88,3 +88,87 @@ class BloomFilter:
 
         return positions
     
+    # ------------------------------------------------------------------
+    # Core operations
+    # -----------------------------------------------------------------
+
+    def insert(self, item):
+        """
+        Add an item to the Bloom filter.
+        We find k positions in the bit array and flip each one to 1.
+        item : the item to add (string, word, etc.)
+        """
+
+        positions = self._get_hash_positions(item)
+
+        for pos in positions:
+            self.bit_array[pos] = 1
+
+        self.num_inserted += 1
+
+    def contains(self, item):
+        """
+        Check whether an item might be in the Bloom filter.
+        Returns True  -> item is MAYBE in the set (could be a false positive)
+        Returns False -> item is DEFINITELY NOT in the set
+
+        item : the item to look up
+        """
+
+        positions = self._get_hash_positions(item)
+
+        # if even one bit is 0, the item was definitely never inserted
+        for pos in positions:
+            if self.bit_array[pos] == 0:
+                return False
+
+        # all bits are 1, so the item is probably in the set
+        return True
+
+    # ------------------------------------------------------------------
+    # Utility methods
+    # ------------------------------------------------------------------
+
+    def get_false_positive_rate(self):
+        """
+        Estimate the current false positive rate given how many items
+        have actually been inserted so far.
+
+        Formula: (1 - e^(-k * n / m)) ^ k
+          k = number of hash functions
+          n = items inserted so far
+          m = bit array size
+        """
+
+        k = self.num_hash_functions
+        n = self.num_inserted
+        m = self.bit_array_size
+
+        if m == 0 or n == 0:
+            return 0.0
+
+        exponent = -k * n / m
+        current_rate = (1 - math.exp(exponent)) ** k
+        return current_rate
+
+    def count_bits_set(self):
+        """Return how many bits in the array are currently set to 1."""
+        return sum(self.bit_array)
+
+    def get_memory_bytes(self):
+        """
+        Logical size of the bit array in bytes (bits / 8).
+        In Python a real bitset would use this much; our list uses more.
+        """
+        return math.ceil(self.bit_array_size / 8)
+
+    def __repr__(self):
+        return (
+            f"BloomFilter("
+            f"expected={self.expected_items}, "
+            f"fpr={self.false_positive_rate}, "
+            f"m={self.bit_array_size} bits, "
+            f"k={self.num_hash_functions} hashes, "
+            f"inserted={self.num_inserted})"
+        )
+
