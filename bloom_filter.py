@@ -172,3 +172,90 @@ class BloomFilter:
             f"inserted={self.num_inserted})"
         )
 
+   # ------------------------------------------------------------------
+    # Utility methods
+    # ------------------------------------------------------------------
+
+    def get_false_positive_rate(self):
+        """
+        Estimate the current false positive rate given how many items
+        have actually been inserted so far.
+
+        Formula: (1 - e^(-k * n / m)) ^ k
+          k = number of hash functions
+          n = items inserted so far
+          m = bit array size
+        """
+
+        k = self.num_hash_functions
+        n = self.num_inserted
+        m = self.bit_array_size
+
+        if m == 0 or n == 0:
+            return 0.0
+
+        exponent = -k * n / m
+        current_rate = (1 - math.exp(exponent)) ** k
+        return current_rate
+
+    def count_bits_set(self):
+        """Return how many bits in the array are currently set to 1."""
+        return sum(self.bit_array)
+
+    def get_memory_bytes(self):
+        """
+        Logical size of the bit array in bytes (bits / 8).
+        In Python a real bitset would use this much; our list uses more.
+        """
+        return math.ceil(self.bit_array_size / 8)
+
+    def __repr__(self):
+        return (
+            f"BloomFilter("
+            f"expected={self.expected_items}, "
+            f"fpr={self.false_positive_rate}, "
+            f"m={self.bit_array_size} bits, "
+            f"k={self.num_hash_functions} hashes, "
+            f"inserted={self.num_inserted})"
+        )
+
+
+# ------------------------------------------------------------------
+# Quick sanity check when you run this file directly
+# ------------------------------------------------------------------
+
+if __name__ == "__main__":
+    print("Running a quick test of the Bloom filter...\n")
+
+    # create a small filter expecting 100 items at 1% false positive rate
+    my_filter = BloomFilter(expected_items=100, false_positive_rate=0.01)
+    print(my_filter)
+
+    # insert a few words
+    words_to_add = ["apple", "banana", "cherry", "date", "elderberry"]
+    for word in words_to_add:
+        my_filter.insert(word)
+        print(f"  Inserted: {word}")
+
+    print()
+
+    # check words that were inserted -> should all come back True
+    print("Checking inserted words (all should be True):")
+    for word in words_to_add:
+        result = my_filter.contains(word)
+        print(f"  '{word}' in filter? {result}")
+
+    print()
+
+    # check words that were NOT inserted -> should mostly be False
+    words_not_added = ["fig", "grape", "honeydew", "kiwi", "lemon"]
+    print("Checking words NOT inserted (should mostly be False):")
+    false_positives = 0
+    for word in words_not_added:
+        result = my_filter.contains(word)
+        print(f"  '{word}' in filter? {result}")
+        if result:
+            false_positives += 1
+
+    print(f"\nFalse positives: {false_positives} out of {len(words_not_added)}")
+    print(f"Estimated false positive rate: {my_filter.get_false_positive_rate():.4f}")
