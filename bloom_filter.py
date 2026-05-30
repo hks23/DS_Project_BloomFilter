@@ -220,9 +220,8 @@ class BloomFilter:
         )
 
 
-# ------------------------------------------------------------------
-# Quick sanity check when you run this file directly
-# ------------------------------------------------------------------
+# -------------------------------------------
+# Main function
 
 if __name__ == "__main__":
     print("Running a quick test of the Bloom filter...\n")
