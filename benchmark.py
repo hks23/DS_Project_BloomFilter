@@ -23,9 +23,6 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from bloom_filter import BloomFilter
 
 
-# ------------------------------------------------------------------
-# Helper: generate random words
-# ------------------------------------------------------------------
 
 def make_random_word(length=8):
     """Return a random lowercase string of the given length."""
