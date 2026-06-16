@@ -102,6 +102,7 @@ $$\boxed{m = \frac{-n \ln(p)}{(\ln 2)^2}}$$
 | False positive probability | $P = \left(1 - e^{-kn/m}\right)^k$ |
 | Optimal hash functions | $k = \dfrac{m}{n} \ln(2)$ |
 | Optimal bit array size | $m = \dfrac{-n \ln(p)}{(\ln 2)^2}$ |
+---
 
 Ran the JOB.sh on wise cluster ![alt text](image.png)
 JOB ID - 60546430 
@@ -117,3 +118,7 @@ SLURM_NODELIST: s28c11n1
 SLURM_JOB_CPUS_PER_NODE: 4
 Date: Tue Jun 16 03:01:07 CEST 2026
 Walltime: 00-01:00:00
+
+RESULTS 
+![alt text](image.png)
+![alt text](image-1.png)
