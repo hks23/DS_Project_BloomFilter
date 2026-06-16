@@ -170,3 +170,100 @@ def run_false_positive_experiment(max_words, false_positive_rate=0.01, steps=20)
             break
 
     return results
+# ------------------------------------------------------------------
+# Experiment 3: compression ratio
+# ------------------------------------------------------------------
+
+def run_compression_experiment():
+    """
+    Compare the logical size (bits) of a Bloom filter against storing
+    all items in a Python set, for different expected sizes and FPRs.
+
+    Returns a list of dicts with the results.
+    """
+
+    print("\n--- Compression ratio experiment ---")
+
+    sizes = [100, 500, 1000, 5000, 10000, 50000, 100000]
+    fprs = [0.01, 0.05, 0.10]
+
+    # rough bytes per item in a Python set (a string of ~8 chars is ~57 bytes)
+    bytes_per_set_item = 57
+
+    results = []
+
+    for n in sizes:
+        for fpr in fprs:
+            bloom = BloomFilter(expected_items=n, false_positive_rate=fpr)
+
+            bloom_bytes = bloom.get_memory_bytes()
+            set_bytes = n * bytes_per_set_item
+
+            compression_ratio = set_bytes / bloom_bytes
+
+            row = {
+                "expected_items": n,
+                "false_positive_rate": fpr,
+                "bloom_bytes": bloom_bytes,
+                "set_bytes": set_bytes,
+                "compression_ratio": round(compression_ratio, 2),
+                "num_hash_functions": bloom.num_hash_functions,
+                "bit_array_size": bloom.bit_array_size,
+            }
+
+            results.append(row)
+            print(
+                f"  n={n:>7}  fpr={fpr}  "
+                f"bloom={bloom_bytes:>7} bytes  "
+                f"set={set_bytes:>8} bytes  "
+                f"ratio={compression_ratio:.1f}x"
+            )
+
+    return results
+
+
+# ------------------------------------------------------------------
+# Save results to CSV
+# ------------------------------------------------------------------
+
+def save_to_csv(rows, filename):
+    """Write a list of dicts to a CSV file."""
+    if not rows:
+        print(f"  (no data to save for {filename})")
+        return
+
+    with open(filename, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=rows[0].keys())
+        writer.writeheader()
+        writer.writerows(rows)
+
+    print(f"  Saved {len(rows)} rows to {filename}")
+
+
+# ------------------------------------------------------------------
+# Main: run all experiments
+# ------------------------------------------------------------------
+
+if __name__ == "__main__":
+    random.seed(42)  # fix seed so results are reproducible
+
+    output_dir = "benchmark_results"
+    os.makedirs(output_dir, exist_ok=True)
+
+    # sizes to test for timing (adjust upward for real HPC runs)
+    timing_sizes = [
+        100, 500, 1000, 2000, 5000,
+        10000, 20000, 50000, 100000, 200000
+    ]
+
+    # ---- run experiments ----
+    timing_rows = run_timing_experiment(timing_sizes)
+    save_to_csv(timing_rows, f"{output_dir}/timing_results.csv")
+
+    fpr_rows = run_false_positive_experiment(max_words=10000)
+    save_to_csv(fpr_rows, f"{output_dir}/false_positive_results.csv")
+
+    compression_rows = run_compression_experiment()
+    save_to_csv(compression_rows, f"{output_dir}/compression_results.csv")
+
+    print("\nAll experiments finished. Results saved in:", output_dir)
