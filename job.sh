@@ -7,7 +7,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=8G
-#SBATCH --partition=batch
+#SBATCH --partition=genius
 
 echo "Started: $(date)"
 echo "Node: $(hostname)"
