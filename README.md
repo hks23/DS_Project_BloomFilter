@@ -104,21 +104,32 @@ $$\boxed{m = \frac{-n \ln(p)}{(\ln 2)^2}}$$
 | Optimal bit array size | $m = \dfrac{-n \ln(p)}{(\ln 2)^2}$ |
 ---
 
-Ran the JOB.sh on wise cluster
-JOB ID - 60546430 
-
-SLURM_JOB_ID: 60546430
-SLURM_JOB_USER: vsc38835
-SLURM_JOB_ACCOUNT: lp_h_ds_students
-SLURM_JOB_NAME: bloom_filter_benchmark
-SLURM_CLUSTER_NAME: wice
-SLURM_JOB_PARTITION: batch
-SLURM_NNODES: 1
-SLURM_NODELIST: s28c11n1
-SLURM_JOB_CPUS_PER_NODE: 4
-Date: Tue Jun 16 03:01:07 CEST 2026
-Walltime: 00-01:00:00
+# Bloom Filter Benchmark — HPC Job Report
+ 
+## Job Details
+ 
+| Field | Value |
+|-------|-------|
+| **Cluster** | Wice (VSC — KU Leuven) |
+| **Job ID** | 60546430 |
+| **Job Name** | bloom_filter_benchmark |
+| **User** | vsc38835 |
+| **Account** | lp_h_ds_students |
+| **Partition** | batch |
+| **Nodes** | 1 (`s28c11n1`) |
+| **CPUs per Node** | 4 |
+| **Walltime** | 00-01:00:00 |
+| **Date** | Tue Jun 16 03:01:07 CEST 2026 |
+ 
 ---
-RESULTS 
-![alt text](image.png)
-![alt text](image-1.png)
+ 
+## Results
+ 
+### Timing Benchmark
+![Timing Results]![alt text](image-2.png)
+ 
+### False Positive Rate 
+![False Positive Results]![alt text](image-3.png)
+
+### Compression Result
+![Compression Result]![alt text]![alt text](image-4.png)
